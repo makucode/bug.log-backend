@@ -25,9 +25,10 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         required: true,
-        minlength: 1,
-        maxlength: 255,
+        minlength: 5,
+        maxlength: 10,
         default: "pending",
+        enum: ["admin", "manager", "developer", "pending"],
     },
     password: {
         type: String,
@@ -49,6 +50,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         default: new Date().toLocaleDateString("de-DE"),
+        immutable: true,
     },
 });
 
@@ -57,7 +59,7 @@ userSchema.pre("save", async function save(next) {
     try {
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
-        return next;
+        return next();
     } catch (error) {
         return next(error);
     }
