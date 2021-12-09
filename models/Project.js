@@ -76,7 +76,7 @@ projectSchema.pre("save", async function save(next) {
         for (let user of users) {
             if (!this.members.includes(user._id)) {
                 user.projects = user.projects.filter(
-                    (project) => project !== this._id
+                    (project) => project === this._id
                 );
                 await user.save();
             } else if (

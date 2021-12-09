@@ -2,6 +2,7 @@ import asyncMiddleware from "../middleware/async.js";
 import Project from "../models/Project.js";
 import Ticket from "../models/Ticket.js";
 import User from "../models/User.js";
+import Comment from "../models/Comment.js";
 
 // GET /api/projects
 // Returns projects based on user role and project assignment
@@ -24,7 +25,7 @@ export const getProjects = asyncMiddleware(async (req, res) => {
             break;
     }
 
-    res.status(200).json(selectedProjects);
+    return res.status(200).json(selectedProjects);
 });
 
 // POST /api/projects
@@ -96,7 +97,7 @@ export const updateProject = asyncMiddleware(async (req, res) => {
 
     const updatedProject = await project.save();
 
-    return res.status(204).send(updatedProject);
+    return res.status(200).json(updatedProject);
 });
 
 // DELETE /api/projects/:id
@@ -112,6 +113,9 @@ export const deleteProject = asyncMiddleware(async (req, res) => {
     const deletedProject = await Project.findByIdAndRemove(req.params.id);
     const deletedTickets = await Ticket.deleteMany({
         project_id: deletedProject._id,
+    });
+    const deletedComments = await Comment.deleteMany({
+        project: deletedProject._id,
     });
 
     const users = await User.updateMany(

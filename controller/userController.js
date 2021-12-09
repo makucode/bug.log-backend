@@ -1,4 +1,5 @@
 import asyncMiddleware from "../middleware/async.js";
+import Project from "../models/Project.js";
 import User from "../models/User.js";
 
 // GET /api/users
@@ -8,12 +9,14 @@ import User from "../models/User.js";
 export const getUsers = asyncMiddleware(async (req, res) => {
     const { role } = req.user;
 
-    let users = await User.find({}).select("-password -role -registrationDate");
+    let users;
 
     if (role !== "admin") {
         users = await User.find({
             role: { $in: ["developer", "manager"] },
         }).select("-password");
+    } else {
+        users = await User.find({}).select("-password");
     }
 
     if (!users) return res.status(404).send("No users found.");
@@ -54,11 +57,20 @@ export const createUser = asyncMiddleware(async (req, res) => {
 
 // GET /api/users/:id
 // Returns a specific user by id
-// Private access, admin only
+// Private access, admin or owner only
 
 export const getSingleUser = asyncMiddleware(async (req, res) => {
-    const user = await User.findById(req.params.id).select("-password");
-    if (!user) return res.status(404).send("User not found.");
+    const { role } = req.user;
+
+    let user;
+    if (role === "admin" || req.user._id === req.params.id) {
+        user = await User.findById(req.params.id).select("-password");
+    }
+
+    if (!user)
+        return res
+            .status(400)
+            .send("User not found or insufficient permissions");
 
     return res.status(200).json(user);
 });
@@ -96,6 +108,7 @@ export const updateUser = asyncMiddleware(async (req, res) => {
         user.firstName = firstName || user.firstName;
         user.lastName = lastName || user.lastName;
         user.email = email || user.email;
+        user.role = req.body.role || user.role;
         if (password) user.password = password;
 
         updatedUser = await user.save();
@@ -105,7 +118,7 @@ export const updateUser = asyncMiddleware(async (req, res) => {
 
     delete updatedUser.password;
 
-    res.status(204).json(updatedUser);
+    res.status(200).json(updatedUser);
 });
 
 // DELETE /api/users/:id
@@ -114,6 +127,20 @@ export const updateUser = asyncMiddleware(async (req, res) => {
 
 export const deleteUser = asyncMiddleware(async (req, res) => {
     const deletedUser = await User.findByIdAndRemove(req.params.id);
+
+    const updatedProjects = await Project.update(
+        {
+            members: deletedUser._id,
+        },
+        { $pull: { members: deletedUser._id } }
+    );
+
+    const updatedTickets = await Ticket.update(
+        {
+            assignedTo_id: deletedUser._id,
+        },
+        { $pull: { assignedTo_id: deletedUser._id } }
+    );
 
     return res.status(200).json(deletedUser);
 });

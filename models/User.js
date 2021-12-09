@@ -49,7 +49,11 @@ const userSchema = new mongoose.Schema({
     registrationDate: {
         type: String,
         required: true,
-        default: new Date().toLocaleDateString("de-DE"),
+        default: new Date().toLocaleDateString("de-DE", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+        }),
         immutable: true,
     },
 });
