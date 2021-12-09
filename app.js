@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import cors from "cors";
+import helmet from "helmet";
 import dbConnect from "./config/db.js";
 import routes from "./config/routes.js";
 import error from "./middleware/error.js";
@@ -10,7 +10,7 @@ dbConnect();
 
 const app = express();
 
-app.use(cors());
+app.use(helmet());
 
 routes(app);
 app.use(error);

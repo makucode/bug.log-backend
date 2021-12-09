@@ -11,10 +11,10 @@ import {
 
 const ticketRoutes = Router();
 
-ticketRoutes.get("/", auth, getTickets);
-ticketRoutes.post("/", auth, createTicket);
-ticketRoutes.get("/:id", auth, getSingleTicket);
-ticketRoutes.delete("/:id", [auth, admin], deleteTicket);
-ticketRoutes.put("/:id", auth, updateTicket);
+ticketRoutes.get("/", getTickets);
+ticketRoutes.post("/", createTicket);
+ticketRoutes.get("/:id", getSingleTicket);
+ticketRoutes.delete("/:id", admin, deleteTicket);
+ticketRoutes.put("/:id", updateTicket);
 
 export default ticketRoutes;

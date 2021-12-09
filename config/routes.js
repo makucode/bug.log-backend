@@ -15,8 +15,8 @@ const routes = (app) => {
 
     app.use("/api/users", userRoutes);
     app.use("/api/auth", authRoutes);
-    app.use("/api/projects", projectRoutes);
-    app.use("/api/tickets", ticketRoutes);
+    app.use("/api/projects", auth, projectRoutes);
+    app.use("/api/tickets", auth, ticketRoutes);
     app.use("/api/comments", auth, commentRoutes);
 };
 

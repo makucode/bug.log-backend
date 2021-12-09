@@ -10,10 +10,10 @@ import {
 
 const projectRoutes = Router();
 
-projectRoutes.get("/", auth, getProjects);
-projectRoutes.post("/", auth, createProject);
-projectRoutes.get("/:id", auth, getSingleProject);
-projectRoutes.delete("/:id", auth, deleteProject);
-projectRoutes.put("/:id", auth, updateProject);
+projectRoutes.get("/", getProjects);
+projectRoutes.post("/", createProject);
+projectRoutes.get("/:id", getSingleProject);
+projectRoutes.delete("/:id", deleteProject);
+projectRoutes.put("/:id", updateProject);
 
 export default projectRoutes;
