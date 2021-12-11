@@ -12,11 +12,9 @@ export const getUsers = asyncMiddleware(async (req, res) => {
     let users;
 
     if (role !== "admin") {
-        users = await User.find({
-            role: { $in: ["developer", "manager"] },
-        }).select("-password");
-    } else {
         users = await User.find({}).select("-password");
+    } else {
+        users = await User.find().select("-password");
     }
 
     if (!users) return res.status(404).send("No users found.");
@@ -60,11 +58,12 @@ export const createUser = asyncMiddleware(async (req, res) => {
 // Private access, admin or owner only
 
 export const getSingleUser = asyncMiddleware(async (req, res) => {
-    const { role } = req.user;
+    const { role, _id } = req.user;
 
     let user;
-    if (role === "admin" || req.user._id === req.params.id) {
-        user = await User.findById(req.params.id).select("-password");
+
+    if (role === "admin" || _id === req.params.id) {
+        user = await User.findById(_id).select("-password");
     }
 
     if (!user)

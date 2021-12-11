@@ -10,7 +10,7 @@ export const getComments = asyncMiddleware(async (req, res) => {
 
     let comments;
 
-    if (role === "admin" || role === "manger") comments = await Comment.find();
+    if (role === "admin" || role === "manager") comments = await Comment.find();
     else comments = await Comment.find({ project: { $in: projects } });
 
     if (!comments) res.status(404).send("No comments found.");
