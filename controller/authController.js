@@ -25,3 +25,22 @@ export const authLogin = asyncMiddleware(async (req, res) => {
         token,
     });
 });
+
+// POST /api/auth/verify
+// Verifys JWT and returns new one
+// Public access
+
+export const authVerify = asyncMiddleware(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    const token = user.generateAuthToken();
+
+    return res.status(200).json({
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+        token,
+    });
+});
